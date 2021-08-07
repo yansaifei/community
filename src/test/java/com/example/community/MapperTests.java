@@ -4,6 +4,7 @@ import com.example.community.dao.DiscussPostMapper;
 import com.example.community.dao.UserMapper;
 import com.example.community.entity.DiscussPost;
 import com.example.community.entity.User;
+import com.example.community.util.MailClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +20,9 @@ public class MapperTests {
 
     @Autowired
     private DiscussPostMapper discussPostMapper;
+
+    @Autowired
+    private MailClient mailClient;
 
     @Test
     public void testSelectUser(){
@@ -59,4 +63,9 @@ public class MapperTests {
         System.out.println(discussPostMapper.selectDiscussPostRows(101));
     }
 
+    @Test
+    public void testMail(){
+        mailClient.sendMail("ysf981106@163.com","mail test","hello ysf");
+        mailClient.sendMail("2583825704@qq.com","mail test","hello ysf");
+    }
 }
