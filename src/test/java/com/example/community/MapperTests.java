@@ -1,8 +1,10 @@
 package com.example.community;
 
 import com.example.community.dao.DiscussPostMapper;
+import com.example.community.dao.LoginTicketMaper;
 import com.example.community.dao.UserMapper;
 import com.example.community.entity.DiscussPost;
+import com.example.community.entity.LoginTicket;
 import com.example.community.entity.User;
 import com.example.community.util.MailClient;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,9 @@ public class MapperTests {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private LoginTicketMaper loginTicketMapper;
 
     @Autowired
     private TemplateEngine templateEngine;
@@ -83,5 +88,27 @@ public class MapperTests {
         System.out.println(content);
 
         mailClient.sendMail("ysf981106@163.com", "HTML", content);
+    }
+
+
+    @Test
+    public void testInsertLoginTicket() {
+        LoginTicket loginTicket = new LoginTicket();
+        loginTicket.setUserId(101);
+        loginTicket.setTicket("abc");
+        loginTicket.setStatus(0);
+        loginTicket.setExpired(new Date(System.currentTimeMillis() + 1000 * 60 * 10));
+
+        loginTicketMapper.insertLoginTicket(loginTicket);
+    }
+
+    @Test
+    public void testSelectLoginTicket() {
+        LoginTicket loginTicket = loginTicketMapper.selectByTicket("abc");
+        System.out.println(loginTicket);
+
+        loginTicketMapper.updateStatus("abc", 1);
+        loginTicket = loginTicketMapper.selectByTicket("abc");
+        System.out.println(loginTicket);
     }
 }
