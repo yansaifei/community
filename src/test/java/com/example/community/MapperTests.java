@@ -1,5 +1,6 @@
 package com.example.community;
 
+import com.example.community.dao.CommentMapper;
 import com.example.community.dao.DiscussPostMapper;
 import com.example.community.dao.LoginTicketMaper;
 import com.example.community.dao.UserMapper;
@@ -33,6 +34,9 @@ public class MapperTests {
 
     @Autowired
     private MailClient mailClient;
+
+    @Autowired
+    private CommentMapper commentMapper;
 
     @Test
     public void testSelectUser(){
@@ -110,5 +114,11 @@ public class MapperTests {
         loginTicketMapper.updateStatus("abc", 1);
         loginTicket = loginTicketMapper.selectByTicket("abc");
         System.out.println(loginTicket);
+    }
+
+
+    @Test
+    public void testComment() {
+        System.out.println(commentMapper.selectCountByEntity(1,275));
     }
 }

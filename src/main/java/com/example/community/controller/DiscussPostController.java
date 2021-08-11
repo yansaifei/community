@@ -1,8 +1,10 @@
 package com.example.community.controller;
 
+import com.example.community.entity.Comment;
 import com.example.community.entity.DiscussPost;
 import com.example.community.entity.Page;
 import com.example.community.entity.User;
+import com.example.community.service.CommentService;
 import com.example.community.service.DiscussPostService;
 import com.example.community.service.UserService;
 import com.example.community.util.CommunityConstant;
@@ -16,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Date;
+import java.util.*;
 
 
 @Controller
@@ -31,6 +33,9 @@ public class DiscussPostController implements CommunityConstant {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private CommentService commentService;
 
 
     @RequestMapping(path = "/add", method = RequestMethod.POST)
@@ -59,6 +64,44 @@ public class DiscussPostController implements CommunityConstant {
         model.addAttribute("user", user);
 
 
+        page.setLimit(5);
+        page.setPath("/discuss/detail/" + discussPostId);
+        page.setRows(post.getCommentCount());
+
+        List<Comment> commentList = commentService.findCommentsByEntity(
+                ENTITY_TYPE_POST, post.getId(), page.getOffset(), page.getLimit());
+
+        List<Map<String, Object>> commentVoList = new ArrayList<>();
+        if (commentList != null) {
+            for(Comment comment : commentList) {
+                Map<String, Object> commentVo = new HashMap<>();
+                commentVo.put("comment", comment);
+                commentVo.put("user", userService.findUserById(comment.getUserId()));
+
+                List<Comment> replyList = commentService.findCommentsByEntity(
+                        ENTITY_TYPE_COMMENT, comment.getId(),0, Integer.MAX_VALUE);
+
+                List<Map<String, Object>> replyVoList = new ArrayList<>();
+                if (replyList != null) {
+                    for(Comment reply : replyList) {
+                        Map<String, Object> replyVo = new HashMap<>();
+                        replyVo.put("reply", reply);
+                        replyVo.put("user", userService.findUserById(reply.getUserId()));
+                        User target = reply.getTargetId() == 0 ? null : userService.findUserById(reply.getTargetId());
+                        replyVo.put("target", target);
+
+                        replyVoList.add(replyVo);
+                    }
+                }
+                commentVo.put("replys", replyVoList);
+                int replyCount = commentService.findCommentCount(ENTITY_TYPE_COMMENT, comment.getId());
+                commentVo.put("replyCount", replyCount);
+
+                commentVoList.add(commentVo);
+            }
+        }
+
+        model.addAttribute("comments", commentVoList);
 
         return "/site/discuss-detail";
     }
