@@ -1,11 +1,9 @@
 package com.example.community;
 
-import com.example.community.dao.CommentMapper;
-import com.example.community.dao.DiscussPostMapper;
-import com.example.community.dao.LoginTicketMaper;
-import com.example.community.dao.UserMapper;
+import com.example.community.dao.*;
 import com.example.community.entity.DiscussPost;
 import com.example.community.entity.LoginTicket;
+import com.example.community.entity.Message;
 import com.example.community.entity.User;
 import com.example.community.util.MailClient;
 import org.junit.jupiter.api.Test;
@@ -37,6 +35,9 @@ public class MapperTests {
 
     @Autowired
     private CommentMapper commentMapper;
+
+    @Autowired
+    private MessageMapper messageMapper;
 
     @Test
     public void testSelectUser(){
@@ -120,5 +121,29 @@ public class MapperTests {
     @Test
     public void testComment() {
         System.out.println(commentMapper.selectCountByEntity(1,275));
+    }
+
+
+    @Test
+    public void testSelectLetters() {
+        List<Message> list = messageMapper.selectConversations(111, 0, 20);
+        for (Message message : list) {
+            System.out.println(message);
+        }
+
+        int count = messageMapper.selectConversationCount(111);
+        System.out.println(count);
+
+        list = messageMapper.selectLetters("111_112", 0, 10);
+        for (Message message : list) {
+            System.out.println(message);
+        }
+
+        count = messageMapper.selectLetterCount("111_112");
+        System.out.println(count);
+
+        count = messageMapper.selectLetterUnreadCount(131, "111_131");
+        System.out.println(count);
+
     }
 }
