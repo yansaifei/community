@@ -3,8 +3,10 @@ package com.example.community.controller;
 
 import com.example.community.annotation.LoginRequired;
 import com.example.community.entity.User;
+import com.example.community.service.FollowService;
 import com.example.community.service.LikeService;
 import com.example.community.service.UserService;
+import com.example.community.util.CommunityConstant;
 import com.example.community.util.CommunityUtil;
 import com.example.community.util.HostHolder;
 import org.apache.commons.lang3.StringUtils;
@@ -26,7 +28,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping(path = "/user")
-public class UserController {
+public class UserController implements CommunityConstant {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
@@ -47,6 +49,9 @@ public class UserController {
 
     @Autowired
     private LikeService likeService;
+
+    @Autowired
+    private FollowService followService;
 
     @LoginRequired
     @RequestMapping(path = "/setting", method = RequestMethod.GET)
@@ -124,7 +129,7 @@ public class UserController {
     @RequestMapping(path = "/profile/{userId}", method = RequestMethod.GET)
     public String getProfilePage(@PathVariable("userId")int userId, Model model) {
         User user = userService.findUserById(userId);
-        if(user == null) {
+        if (user == null) {
             throw new IllegalArgumentException("该用户不存在！");
         }
 
@@ -133,6 +138,17 @@ public class UserController {
         int likeCount = likeService.findUserLikeCount(userId);
         model.addAttribute("likeCount", likeCount);
 
+        long followeeCount = followService.findFolloweeCount(userId, ENTITY_TYPE_USER);
+        model.addAttribute("followeeCount", followeeCount);
+
+        long followerCount = followService.findFollowerCount(ENTITY_TYPE_USER, userId);
+        model.addAttribute("followerCount", followerCount);
+
+        boolean hasFollowed = false;
+        if (hostHolder.getUser() != null) {
+            hasFollowed = followService.hasFollowed(hostHolder.getUser().getId(), ENTITY_TYPE_USER, userId);
+        }
+        model.addAttribute("hasFollowed", hasFollowed);
 
         return "/site/profile";
     }
