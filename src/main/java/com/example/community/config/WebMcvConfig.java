@@ -1,6 +1,7 @@
 package com.example.community.config;
 
 
+import com.example.community.controller.interceptor.DataInterceptor;
 import com.example.community.controller.interceptor.LoginRequiredInterceptor;
 import com.example.community.controller.interceptor.LoginTicketInterceptor;
 import com.example.community.controller.interceptor.MessageInterceptor;
@@ -21,6 +22,9 @@ public class WebMcvConfig implements WebMvcConfigurer {
     @Autowired
     private MessageInterceptor messageInterceptor;
 
+    @Autowired
+    private DataInterceptor dataInterceptor;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginTicketInterceptor)
@@ -29,6 +33,8 @@ public class WebMcvConfig implements WebMvcConfigurer {
 //        registry.addInterceptor(loginRequiredInterceptor)
 //                .excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg", "/**/*.jpeg");
         registry.addInterceptor(messageInterceptor)
+                .excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg", "/**/*.jpeg");
+        registry.addInterceptor(dataInterceptor)
                 .excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg", "/**/*.jpeg");
     }
 
